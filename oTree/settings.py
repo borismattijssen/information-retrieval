@@ -40,6 +40,12 @@ SESSION_CONFIGS = [
         'num_demo_participants': 1,
         'app_sequence': ['quiz'],
     },
+    {
+        'name': 'time_pressure',
+        'display_name': "Project!",
+        'num_demo_participants': 100,
+        'app_sequence': ['time_pressure'],
+    },
 ]
 # see the end of this file for the inactive session configs
 

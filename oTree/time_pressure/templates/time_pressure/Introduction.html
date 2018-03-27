@@ -1,0 +1,26 @@
+{% extends "global/Page.html" %}
+{% load staticfiles otree %}
+
+{% block title %}
+    Introduction
+{% endblock %}
+
+{% block content %}
+
+    <h4>Welcome to Geraldine the Search Machine</h4>
+    <p>Geraldine is a search machine which is connected to the TREC dataset (...)</p>
+
+    <h5>Task</h5>
+    <p>You are asked to perform search tasks based on a certain topic. Select the results that you think are relevant. (...)</p>
+
+    <p><b>This task will take less than 15 minutes!</b></p>
+
+    <h5>TL;DR</h5>
+    <ul>
+        <li>Search relevant documents according to the topic</li>
+        <li>Mark them as relevant</li>
+    </ul>
+
+    {% next_button %}
+
+{% endblock %}

@@ -1,0 +1,57 @@
+{% extends "global/Page.html" %}
+{% load staticfiles otree %}
+
+{% block title %}
+    Search Task
+{% endblock %}
+
+{% block content %}
+
+    <p>Your task is to find relevant documents for the topic: (...)</p>
+
+    <!--Search form-->
+    <form>
+        <input type="text" name="search" placeholder="Search..">
+    </form>
+
+    <!--Results-->
+    <div class="results">
+
+    </div>
+
+    <!--Logs-->
+    <input type="hidden" name="total_task_time"
+    value="0" id="total_task_time"/>
+
+    {% next_button %}
+
+{% endblock %}
+
+<!--CSS-->
+{% block styles %}
+
+    <style type="text/css">
+        input[type=text] {
+            width: 100%;
+        }
+    </style>
+
+{% endblock %}
+
+<!--Javascript-->
+{% block scripts %}
+
+    <script>
+        $(document).ready(function () {
+           var t0 = new Date().getTime() / 1000;
+           var t1 = 0;
+
+            $(".otree-btn-next").hover(function(){
+                t1 = new Date().getTime() / 1000;
+                t = t1-t0;
+                $("#total_task_time").val(t);
+            });
+        });
+    </script>
+
+{% endblock %}

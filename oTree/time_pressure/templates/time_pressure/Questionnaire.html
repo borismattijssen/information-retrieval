@@ -1,0 +1,14 @@
+{% extends "global/Page.html" %}
+{% load staticfiles otree %}
+
+{% block title %}
+    Questionnaire
+{% endblock %}
+
+{% block content %}
+
+    {% formfield player.submitted_answer label=player.question %}
+
+    {% next_button %}
+
+{% endblock %}
