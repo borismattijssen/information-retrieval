@@ -43,7 +43,7 @@ for fname in files:
         for doc in docs:
             try:
                 # only process news stories
-                if doc.find('doctype').string.strip() != "NEWS STORY":
+                if doc.find('doctype') != None and doc.find('doctype').string.strip() != "NEWS STORY":
                     continue
                 actions.append({
                     '_index': args.index,
@@ -62,5 +62,7 @@ for fname in files:
                     ferr.write(str(doc))
 
         helpers.bulk(es, actions)
+    with open("processed_docs.txt", "a") as ferr:
+        ferr.write(fname + "\n")
 
-print("Total of {} documents".format(count))
+print("Total of {} documents processed".format(count))
