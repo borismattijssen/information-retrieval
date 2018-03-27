@@ -1,0 +1,130 @@
+<!SGML "ISO 8879:1986"
+
+    CHARSET
+        BASESET
+	 "ISO 646-1983//CHARSET
+          International Reference Version (IRV)//ESC 2/5 4/0"
+
+	DESCSET
+           0  9 UNUSED
+	   9  2  9
+	  11  2 UNUSED
+	  13  1 13
+	  14 18 UNUSED
+	  32 95 32
+	 127  1 UNUSED
+         128 32 UNUSED  -- no such characters --
+         160 95 162     -- 160 through 254 inclusive --
+	 255  1 UNUSED
+
+    CAPACITY PUBLIC    "ISO 8879:1986//CAPACITY Reference//EN"
+    SCOPE    DOCUMENT
+    SYNTAX
+       SHUNCHAR CONTROLS 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17
+                18 19 20 21 22 23 24 25 26 27 28 29 30 31 127 255
+       BASESET  "ISO 646-1983//CHARSET
+                 International Reference Version (IRV)//ESC 2/5 4/0"
+       DESCSET  0 128 0
+       FUNCTION
+         RE        13
+	 RS        10
+	 SPACE     32
+	 TAB       SEPCHAR 9
+
+       NAMING
+         LCNMSTRT  ""
+	 UCNMSTRT  ""
+	 LCNMCHAR  "_-."
+	 UCNMCHAR  "_-."
+	 NAMECASE  GENERAL     NO
+		   ENTITY      NO
+DELIM    GENERAL   SGMLREF
+	 SHORTREF  SGMLREF
+NAMES    SGMLREF
+QUANTITY SGMLREF
+	 ATTCNT    99999999
+	 ATTSPLEN  99999999
+	 DTEMPLEN  24000
+	 ENTLVL    99999999
+	 GRPCNT    99999999
+	 GRPGTCNT  99999999
+	 GRPLVL    99999999
+	 LITLEN    24000
+	 NAMELEN   99999999
+	 PILEN     24000
+	 TAGLEN    99999999
+	 TAGLVL    99999999
+			   FEATURES
+MINIMIZE DATATAG   NO
+	 OMITTAG   YES
+	 RANK      YES
+	 SHORTTAG  YES
+LINK     SIMPLE    YES 1000
+	 IMPLICIT  YES
+	 EXPLICIT  YES 1
+OTHER    CONCUR    NO
+	 SUBDOC    YES 99999999
+	 FORMAL    YES
+			  APPINFO NONE>
+
+<!-- this is the dtd for AQUAINT -->
+
+<!DOCTYPE AQUAINT[
+
+<!--   SGML DESCRIPTIONS         -->
+<!--   +     Required and repeatable element -->
+<!--   ?     Optional element                -->
+<!--   *     Optional and repeatable element -->
+<!--   ,     elements must follow in this order  -->
+<!--   |     "or" connector (pick one element)   -->
+<!--   &     "and" connector (all must occur in any order)   -->
+
+<!--       ELEMENT     S E  CONTENT                          -->
+
+<!-- top level -->
+<!ELEMENT  AQUAINT     O O  (DOC+)                              >
+
+<!-- fields of DOC -->
+<!ELEMENT  DOC         - -  (DOCNO*
+                           & DOCTYPE*
+                           & DATE_TIME*
+                           & HEADER*
+                           & BODY*
+                           & TRAILER*)                          >
+
+<!-- fields of "DOC" -->
+<!ELEMENT  DOCNO       - -  (#PCDATA)                             >
+<!ELEMENT  DOCTYPE     - -  (#PCDATA)                             >
+<!ELEMENT  TXTTYPE     - -  (#PCDATA)                             >
+<!ELEMENT  DATE_TIME   - -  (#PCDATA)                             >
+<!ELEMENT  HEADER      - -  (#PCDATA)                             >
+<!ELEMENT  BODY        - -  (SLUG* | CATEGORY* | HEADLINE* | TEXT* | #PCDATA)+ >
+<!ELEMENT  TRAILER     - -  (#PCDATA)                             >
+
+<!-- fields of "BODY" -->
+<!ELEMENT  SLUG        - -  (#PCDATA)                             >
+<!ELEMENT  HEADLINE    - -  (#PCDATA)                             >
+<!ELEMENT  CATEGORY    - -  (#PCDATA)                             >
+<!ELEMENT  TEXT        - -  (P* | SUBHEAD* | ANNOTATION* | #PCDATA)+ >
+
+<!--fields of "TEXT" -->
+<!ELEMENT  P           - O  (#PCDATA)                             >
+<!ELEMENT  SUBHEAD     - -  (#PCDATA)                             >
+<!ELEMENT  ANNOTATION  - -  (#PCDATA)                             >
+
+<!--Entities -->
+<!ENTITY   AMP     "&" >
+<!ENTITY   Cx14    "" >
+<!ENTITY   Cx13    "" >
+<!ENTITY   Cx12    "" >
+<!ENTITY   Cx11    "" >
+<!ENTITY   Cx1f    "" >
+<!ENTITY   HT      "" >
+<!ENTITY   QL      "" >
+<!ENTITY   QR      "" >
+<!ENTITY   LR      "" >
+<!ENTITY   UR      "" >
+<!ENTITY   QC      "" >
+<!ENTITY #DEFAULT SYSTEM >
+
+]>
