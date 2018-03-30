@@ -4,6 +4,8 @@ import sys
 import re
 import json
 import glob
+import traceback
+
 
 from bs4 import BeautifulSoup
 from elasticsearch import Elasticsearch
@@ -45,6 +47,15 @@ for fname in files:
                 # only process news stories
                 if doc.find('doctype') != None and doc.find('doctype').string.strip() != "NEWS STORY":
                     continue
+
+                body = ""
+                if doc.find('text').string != None:
+                    body = doc.find('text').string.strip()
+                if len(doc.find_all('p')) > 0:
+                    body = "".join(['<p>{}</p>'.format(x.string) for x in doc.find_all('p')]),
+                if body == "":
+                    with open("empty_bodies.txt", "a") as ferr:
+                        ferr.write(fname + "#" + doc.find('docno').string.strip() + "\n")
                 actions.append({
                     '_index': args.index,
                     '_type': '_doc',
@@ -53,12 +64,14 @@ for fname in files:
                         # parse time and let Elastic know
                         'datetime': doc.find('date_time').string.strip(),
                         'headline': doc.find('headline').string.strip(),
-                        'body': "".join(['<p>{}</p>'.format(x.string) for x in doc.find_all('p')]),
+                        'body': body
                     }
                 })
                 count += 1
-            except:
+            except Exception as e:
                 with open("parse_errors.txt", "a") as ferr:
+                    ferr.write(str(e) + "\n")
+                    ferr.write(traceback.format_exc() + "\n")
                     ferr.write(str(doc))
 
         helpers.bulk(es, actions)
