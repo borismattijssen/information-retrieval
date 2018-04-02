@@ -62,7 +62,7 @@ for fname in files:
                     '_source': {
                         'docno': doc.find('docno').string.strip(),
                         # parse time and let Elastic know
-                        'datetime': doc.find('date_time').string.strip(),
+                        'datetime': doc.find('date_time').string.strip() + ":00",
                         'headline': doc.find('headline').string.strip(),
                         'body': body
                     }
