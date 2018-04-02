@@ -15,7 +15,7 @@
     </form>
 
     <!--Results-->
-    <div class="results">
+    <div id="results">
         Results...
     </div>
 
@@ -39,51 +39,54 @@
 {% endblock %}
 
 {% block scripts %}
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jsrender/0.9.90/jsrender.min.js" integrity="sha256-btLQj6RlkxXK4cg6XHngg3OVgPdiD3QlkaYMZacCmpA=" crossorigin="anonymous"></script>
 
-    <!--Javascript-->
-    <script>
-        $(document).ready(function () {
-           var t0 = new Date().getTime() / 1000;
-           var t1 = 0;
 
-            $(".otree-btn-next").click(function(){
-                t1 = new Date().getTime() / 1000;
-                t = t1-t0;
-                $("#total_task_time").val(t);
+  <script id="resultsTemplate" type="text/x-jsrender">
+  <div>
+    <b>{% templatetag openvariable %}:_source.headline{% templatetag closevariable %}</b>
+  </div>
+  </script>
 
-            });
+  <!--Javascript-->
+  <script>
+  var resultsTmpl = $.templates("#resultsTemplate");
+
+  $(function(){
+    $(".search").keyup(function() {
+      var searchid = $(this).val();
+      var dataString = {
+          "from" : 0,
+          "size" : 10,
+          "query": {
+              "query_string" : {
+                  "fields" : ["headline", "body"],
+                  "query" : "economy"
+              }
+          }
+      };
+
+      if(searchid!='') {
+        dataString.query.query_string.query = searchid;
+        $.ajax({
+            method: 'POST',
+            url: "http://35.190.214.52:9200/_search",
+            dataType: 'json',
+            contentType: 'application/json',
+            processData: false,
+            data: JSON.stringify(dataString),
+            success: function(data) {
+                console.log(data)
+                $('#results').html(resultsTmpl.render(data.hits.hits));
+            },
+            error: function(e) {
+              console.log(e);
+            }
         });
-
-        $(function(){
-            $(".search").keyup(function() {
-                var searchid = $(this).val();
-                var dataString = {
-                    "from" : 0,
-                    "size" : 10,
-                    "query": {
-                        "query_string" : {
-                            "fields" : ["headline", "body"],
-                                "query" : "economy"
-                        }
-                    }
-                };
-
-                if(searchid!='') {
-                  var xhr = new XMLHttpRequest();
-                  xhr.open('GET', 'http://35.190.214.52:9200/_search');
-                  xhr.setRequestHeader('Content-Type', 'application/json');
-                  xhr.onload = function() {
-                      if (xhr.status === 200) {
-                          var data = JSON.parse(xhr.responseText);
-                          console.log(data);
-                      } else {
-                        console.log("Error", oXHR.statusText);
-                      }
-                  };
-                  xhr.send(JSON.stringify(dataString));
-                }return false;
-                });
-            });
-    </script>
+      }
+      return false;
+    });
+  });
+  </script>
 
 {% endblock %}
