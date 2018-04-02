@@ -25,17 +25,40 @@ class Constants(BaseConstants):
         [7, ''],
     ]
     topics = [
-        'wildlife extinction',
-        'journalist risk',
-        'piracy',
-        'population growth'
+        ['Wildlife Extinction',
+         'The spotted owl episode in America highlighted U.S. efforts to prevent the extinction of wildlife species. '
+         'What is not well known is the effort of other countries to prevent the demise of species native to their countries. '
+         'What other countries have begun efforts to prevent such declines?',
+         'A relevant item will specify the country, the involved species, and steps taken to save the species.'
+         ],
+        ['Journalist Risk',
+         'Identify instances where a journalist has been put at risk (e.g., killed, arrested or taken hostage) '
+         'in the performance of his work.',
+         'Any document identifying an instance where a journalist or correspondent has been killed, '
+         'arrested or taken hostage in the performance of his work is relevant.'
+         ],
+        ['Piracy',
+         'What modern instances have there been of old fashioned piracy, the boarding or taking control of boats?',
+         'Documents discussing piracy on any body of water are relevant.  Documents discussing the legal taking of '
+         'ships or their contents by a national authority are non-relevant.  Clashes between fishing vessels over'
+         'fishing are not relevant, unless one vessel is boarded.'
+         ],
+        ['Population Growth',
+         'What measures have been taken worldwide and what countries have been effective in curbing population growth?',
+         'A relevant document must describe an actual case in which population measures have been taken and their results are known. '
+         'The reduction measures must have been actively pursued; that is, passive events such as disease or famine'
+         'involuntarily reducing the population are not relevant.'
+         ]
     ]
 
 
 class Subsession(BaseSubsession):
     def creating_session(self):
         for p in self.get_players():
-            p.topic = Constants.topics[(p.id_in_group % 4) - 1]
+            topic = Constants.topics[(p.id_in_group % 4) - 1]
+            p.topicname = topic[0]
+            p.topicdes = topic[1]
+            p.topicnar = topic[2]
             p.treatment = random.choice([True, False])
 
 
@@ -62,5 +85,7 @@ class Player(BasePlayer):
 
     total_task_time = models.FloatField(initial=300)
 
-    topic = models.StringField()
+    topicname = models.StringField()
+    topicdes = models.StringField()
+    topicnar = models.StringField()
     treatment = models.BooleanField()

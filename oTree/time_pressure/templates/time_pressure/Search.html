@@ -7,10 +7,14 @@
 
 {% block content %}
 
-    <p>Your task is to find relevant documents for the topic: {{ player.topic }}</p>
+    <p>Your task is to find relevant documents for the topic: <b>{{ player.topicname }}</b></p><br>
+
+    <p>{{ player.topicdes }}</p><br>
+
+    <p>{{ player.topicnar }}</p><br>
 
     <!--Search form-->
-    <input class="search" id="search_field" type="text" name="search" value="wildlife extinction" placeholder="Search..">
+    <input class="search" id="search_field" type="text" name="search" value="" placeholder="Search..">
     <input type="submit" id="search_button" value="Search">
 
     <hr>
