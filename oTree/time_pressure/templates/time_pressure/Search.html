@@ -19,8 +19,8 @@
     <div id="serp">
       <div id="results"></div>
       <div>
-        <a href="javascript:void(0)" onclick="prevPage()" class="btn btn-primary">&lt; previous page</a>
-        <a href="javascript:void(0)" onclick="nextPage()" class="btn btn-primary">next page &gt;</a>
+        <a href="javascript:void(0)" onclick="prevPage()" class="btn btn-secondary">&lt; previous page</a>
+        <a href="javascript:void(0)" onclick="nextPage()" class="btn btn-secondary">next page &gt;</a>
       </div>
       Current page: <span id="current_page">1</span>
     </div>
@@ -30,6 +30,10 @@
     <input type="hidden" name="total_task_time"
     value="300" id="total_task_time"/>
     <input type="hidden" name="relevant_marks" id="relevant_marks" value="">
+    <input type="hidden" name="marked_as_relevant" id="marked_as_relevant" value="0">
+    <input type="hidden" name="queries_issued" id="queries_issued" value="0">
+    <input type="hidden" name="documents_viewed" id="documents_viewed" value="0">
+    <input type="hidden" name="serps_viewed" id="serps_viewed" value="0">
 
 {% endblock %}
 
@@ -86,12 +90,12 @@
   <!--Mark or unmark as relevance (used in #documentTemplate)-->
   <script id="relevantButtonTemplate" type="text/x-jsrender">
   <div>
-    <a href="javascript:void(0)" onclick="backToSearchPage()" class="btn btn-primary">Back to search results</a>
+    <a href="javascript:void(0)" onclick="backToSearchPage()" class="btn btn-secondary">Back to search results</a>
     {% templatetag openvariable %}if marked_relevant{% templatetag closevariable %}
-      <a href="javascript:void(0)" onclick="unmarkAsRelevant('{% templatetag openvariable %}:_source.docno{% templatetag closevariable %}','{% templatetag openvariable %}:_id{% templatetag closevariable %}')" class="btn btn-primary">Unmark as relevant</a>
+      <a href="javascript:void(0)" onclick="unmarkAsRelevant('{% templatetag openvariable %}:_source.docno{% templatetag closevariable %}','{% templatetag openvariable %}:_id{% templatetag closevariable %}')" class="btn btn-secondary">Unmark as relevant</a>
       You marked this document as relevant.
     {% templatetag openvariable %}else{% templatetag closevariable %}
-      <a href="javascript:void(0)" onclick="markAsRelevant('{% templatetag openvariable %}:_source.docno{% templatetag closevariable %}','{% templatetag openvariable %}:_id{% templatetag closevariable %}')" class="btn btn-primary">Mark as relevant</a>
+      <a href="javascript:void(0)" onclick="markAsRelevant('{% templatetag openvariable %}:_source.docno{% templatetag closevariable %}','{% templatetag openvariable %}:_id{% templatetag closevariable %}')" class="btn btn-secondary">Mark as relevant</a>
     {% templatetag openvariable %}/if{% templatetag closevariable %}
   </div>
   </script>
@@ -117,6 +121,12 @@
       }
   };
 
+  // increase the value of a hidden input
+  function increase(field){
+    var curr = parseInt($('#' + field).val());
+    $('#' + field).val(curr + 1);
+  }
+
   // show SERP
   function backToSearchPage() {
     $('#search_page').hide();
@@ -127,10 +137,11 @@
   // 1) store docno in hidden input
   // 2) rerender document by ID to show different button
   function markAsRelevant(docno, id) {
+    increase('marked_as_relevant');
     var docnos = $('#relevant_marks').val().split(',');
     docnos.push(docno);
     $('#relevant_marks').val(docnos.join(','));
-    showDocument(id);
+    renderDocument(id);
   }
 
   // unmark a document as relevant
@@ -143,11 +154,17 @@
       docnos.splice(index, 1);
     }
     $('#relevant_marks').val(docnos.join(','));
-    showDocument(id);
+    renderDocument(id);
+  }
+
+  // increase the amount of documents viewed and render it
+  function showDocument(id) {
+    increase('documents_viewed');
+    renderDocument(id);
   }
 
   // show a document by Elastic ID
-  function showDocument(id) {
+  function renderDocument(id) {
     relevant_marks = $('#relevant_marks').val().split(',');
     $.ajax({
         method: 'GET',
@@ -192,6 +209,7 @@
     var searchid = $('#search_field').val();
 
     if(searchid!='') {
+      increase('serps_viewed');
       // implicit ANDing of search terms
       searchid = searchid.replace(' ', ' AND ');
       // fill payload
@@ -207,6 +225,7 @@
           success: function(data) {
               // remove html tags from body field
               data = $.map(data.hits.hits, function(n, i){
+                // body = n._source.body.constructor === Array ? n._source.body[0] : n._source.body;
                 d = $(n._source.body[0]);
                 n._source.body = d.text().substring(0, 255);
                 return n;
@@ -228,9 +247,10 @@
   $(function(){
     // when enter is pressed on the search field
     $('#search_field').keydown(function(event){
-      page = 0;
       if(event.keyCode == 13) {
+        page = 0;
         doSearch(page);
+        increase('queries_issued');
         event.preventDefault();
         return false;
       }
@@ -239,6 +259,7 @@
     $('#search_button').click(function(event){
       page = 0;
       doSearch(page);
+      increase('queries_issued');
       event.preventDefault();
       return false;
     });
@@ -250,6 +271,7 @@
 
       // dont block when oTree submits page
       timeLeft = parseInt($('.otree-timer__time-left').text().replace(':',''));
+      console.log(timeLeft);
       if(timeLeft <= 5) {
         confirmationMessage = null;
       }
