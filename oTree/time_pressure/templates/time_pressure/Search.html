@@ -146,6 +146,10 @@
   var resultsTmpl = $.templates("#resultsTemplate");
   var documentTmpl = $.templates("#documentTemplate");
 
+  // elastic backend IP address
+  var elasticIP = '10.132.0.2'
+  // var elasticIP = '35.190.214.52'
+
   // SERP number
   var page = 0;
   // timer used to measure how long document pages were viewed
@@ -269,7 +273,7 @@
     relevant_marks = $('#relevant_marks').val().split(',');
     $.ajax({
         method: 'GET',
-        url: "http://35.190.214.52:9200/roy/_doc/" + id,
+        url: "http://" + elasticIP + ":9200/roy/_doc/" + id,
         dataType: 'json',
         contentType: 'application/json',
         success: function(data) {
@@ -330,7 +334,7 @@
       dataString.from = page;
       $.ajax({
           method: 'POST',
-          url: "http://35.190.214.52:9200/_search",
+          url: "http://" + elasticIP + ":9200/_search",
           dataType: 'json',
           contentType: 'application/json',
           processData: false,
