@@ -5,6 +5,7 @@ ENV REDIS_URL="redis://redis:6379" \
 
 ADD ./ /opt/otree
 
+
 RUN apk -U add --no-cache bash \
                           curl \
                           gcc \
