@@ -14,18 +14,18 @@ var dataString = {
         }
     };
 
-$.ajax({
-    type: "GET",
-    url: "http://23.251.143.109:9200/_search",
-    dataType: 'json',
-    // contentType: 'application/json',
-    processData: false,
-    data: dataString,
-    success: function(data) {
-        console.log(data)
-    },
-    error: function(e) {
-      console.log(e);
-    }
-});
+// $.ajax({
+//     type: "GET",
+//     url: "http://23.251.143.109:9200/_search",
+//     dataType: 'json',
+//     // contentType: 'application/json',
+//     processData: false,
+//     data: JSON.stringify(dataString),
+//     success: function(data) {
+//         console.log(data)
+//     },
+//     error: function(e) {
+//       console.log(e);
+//     }
+// });
 </script>
