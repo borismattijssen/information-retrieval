@@ -24,6 +24,17 @@ class Constants(BaseConstants):
         [6, ''],
         [7, ''],
     ]
+    profession_choices = [
+        ['student', 'Student'],
+        ['uni_staff', 'University Staff'],
+        ['working', 'Working'],
+        ['none', 'None of the above']
+    ]
+    genders = [
+        ['male', 'Male'],
+        ['female', 'Female'],
+        ['none', 'None']
+    ]
     topics = [
         ['Wildlife Extinction',
          'The spotted owl episode in America highlighted U.S. efforts to prevent the extinction of wildlife species. What is not well known is the effort of other countries to prevent the demise of species native to their countries. What other countries have begun efforts to prevent such declines?',
@@ -60,6 +71,32 @@ class Group(BaseGroup):
 
 
 class Player(BasePlayer):
+    age = models.IntegerField(
+        label='What is your age?'
+    )
+    gender = models.StringField(
+        label='What is your gender?',
+        choices=Constants.genders
+    )
+    profession = models.StringField(
+        label='What is your current occupation?',
+        choices=Constants.profession_choices
+    )
+    difficult = models.IntegerField(
+        label='Did you feel time pressure?',
+        choices=Constants.choices,
+        widget=widgets.RadioSelectHorizontal
+    )
+    performed_well = models.IntegerField(
+        label='Did you feel time pressure?',
+        choices=Constants.choices,
+        widget=widgets.RadioSelectHorizontal
+    )
+    interesting = models.IntegerField(
+        label='Did you feel time pressure?',
+        choices=Constants.choices,
+        widget=widgets.RadioSelectHorizontal
+    )
     feel_time_pressure = models.IntegerField(
         label='Did you feel time pressure?',
         choices=Constants.choices,

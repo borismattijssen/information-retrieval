@@ -34,7 +34,17 @@ class Search(Page):
 
 class Questionnaire(Page):
     form_model = 'player'
-    form_fields = ['feel_time_pressure', 'need_work_fast', 'feel_hurried_rushed']
+    form_fields = [
+        'age',
+        'gender',
+        'profession',
+        'difficult',
+        'performed_well',
+        'interesting',
+        'feel_time_pressure',
+        'need_work_fast',
+        'feel_hurried_rushed'
+    ]
 
 
 page_sequence = [

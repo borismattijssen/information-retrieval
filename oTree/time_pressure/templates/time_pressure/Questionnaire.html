@@ -6,8 +6,31 @@
 {% endblock %}
 
 {% block content %}
+    {% formfield player.age %}
+    {% formfield player.gender %}
+    {% formfield player.profession %}
 
-    <b>Did you feel time pressure?</b>
+
+    <b>Was the search task difficult?</b>
+
+    <table class="table">
+        <tr>
+            <th>strongly disagree</th>
+            <th>disagree</th>
+            <th>slightly disagree</th>
+            <th>neutral</th>
+            <th>slightly agree</th>
+            <th>agree</th>
+            <th>strongly agree</th>
+        </tr>
+        <tr>
+            {% for choice in form.difficult %}
+                <td>{{ choice }}</td>
+            {% endfor %}
+        </tr>
+    </table>
+
+    <b>When doing the search tasks, did you feel time pressure?</b>
 
     <table class="table">
         <tr>
@@ -26,7 +49,26 @@
         </tr>
     </table>
 
-    <b>Did you feel the need to work fast?</b>
+    <b>Do you feel like you performed well on the task?</b>
+
+    <table class="table">
+        <tr>
+            <th>strongly disagree</th>
+            <th>disagree</th>
+            <th>slightly disagree</th>
+            <th>neutral</th>
+            <th>slightly agree</th>
+            <th>agree</th>
+            <th>strongly agree</th>
+        </tr>
+        <tr>
+            {% for choice in form.performed_well %}
+                <td>{{ choice }}</td>
+            {% endfor %}
+        </tr>
+    </table>
+
+    <b>When doing the search tasks, did you feel that you needed to work fast?</b>
 
     <table class="table">
         <tr>
@@ -45,7 +87,26 @@
         </tr>
     </table>
 
-    <b>Did you feel hurried or rushed?</b>
+    <b>Did you think the search topic was interesting?</b>
+
+    <table class="table">
+        <tr>
+            <th>strongly disagree</th>
+            <th>disagree</th>
+            <th>slightly disagree</th>
+            <th>neutral</th>
+            <th>slightly agree</th>
+            <th>agree</th>
+            <th>strongly agree</th>
+        </tr>
+        <tr>
+          {% for choice in form.interesting %}
+              <td>{{ choice }}</td>
+          {% endfor %}
+        </tr>
+    </table>
+
+    <b>When doing the search tasks, did you feel hurried or rushed?</b>
 
     <table class="table">
         <tr>
