@@ -63,19 +63,28 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jsrender/0.9.90/jsrender.min.js" integrity="sha256-btLQj6RlkxXK4cg6XHngg3OVgPdiD3QlkaYMZacCmpA=" crossorigin="anonymous"></script>
 
 
+  <!--Template SERP items-->
   <script id="resultsTemplate" type="text/x-jsrender">
   <div class="search_result">
-    <a href="javascript:void(0)" class="search_result_title" onclick="showSearchPage('{% templatetag openvariable %}:_id{% templatetag closevariable %}')">{% templatetag openvariable %}:_source.headline{% templatetag closevariable %}</a><br>
+    <a href="javascript:void(0)" class="search_result_title" onclick="showDocument('{% templatetag openvariable %}:_id{% templatetag closevariable %}')">{% templatetag openvariable %}:_source.headline{% templatetag closevariable %}</a><br>
     {% templatetag openvariable %}:_source.body{% templatetag closevariable %}
   </div>
   </script>
 
-  <script id="pageButtonsTemplate" type="text/x-jsrender">
+  <!--Template for a single document-->
+  <script id="documentTemplate" type="text/x-jsrender">
+  <h1>{% templatetag openvariable %}:_source.headline{% templatetag closevariable %}</h1>
+  {% templatetag openvariable %}include tmpl="#relevantButtonTemplate"/{% templatetag closevariable %}
 
+  <div class="search_page_content" style="margin: 20px 0 20px 0">
+    {% templatetag openvariable %}:_source.body[0]{% templatetag closevariable %}
+  </div>
+
+  {% templatetag openvariable %}include tmpl="#relevantButtonTemplate"/{% templatetag closevariable %}
   </script>
 
-  <script id="pageTemplate" type="text/x-jsrender">
-  <h1>{% templatetag openvariable %}:_source.headline{% templatetag closevariable %}</h1>
+  <!--Mark or unmark as relevance (used in #documentTemplate)-->
+  <script id="relevantButtonTemplate" type="text/x-jsrender">
   <div>
     <a href="javascript:void(0)" onclick="backToSearchPage()" class="btn btn-primary">Back to search results</a>
     {% templatetag openvariable %}if marked_relevant{% templatetag closevariable %}
@@ -85,28 +94,18 @@
       <a href="javascript:void(0)" onclick="markAsRelevant('{% templatetag openvariable %}:_source.docno{% templatetag closevariable %}','{% templatetag openvariable %}:_id{% templatetag closevariable %}')" class="btn btn-primary">Mark as relevant</a>
     {% templatetag openvariable %}/if{% templatetag closevariable %}
   </div>
-
-  <div class="search_page_content" style="margin: 20px 0 20px 0">
-    {% templatetag openvariable %}:_source.body[0]{% templatetag closevariable %}
-  </div>
-
-  <div>
-    <a href="javascript:void(0)" onclick="backToSearchPage()" class="btn btn-secondary">Back to search results</a>
-    {% templatetag openvariable %}if marked_relevant{% templatetag closevariable %}
-      <a href="javascript:void(0)" onclick="unmarkAsRelevant('{% templatetag openvariable %}:_source.docno{% templatetag closevariable %}','{% templatetag openvariable %}:_id{% templatetag closevariable %}')" class="btn btn-secondary">Unmark as relevant</a>
-      You marked this document as relevant.
-    {% templatetag openvariable %}else{% templatetag closevariable %}
-      <a href="javascript:void(0)" onclick="markAsRelevant('{% templatetag openvariable %}:_source.docno{% templatetag closevariable %}','{% templatetag openvariable %}:_id{% templatetag closevariable %}')" class="btn btn-secondary">Mark as relevant</a>
-    {% templatetag openvariable %}/if{% templatetag closevariable %}
-  </div>
   </script>
 
   <!--Javascript-->
   <script>
+  // rendering templates
   var resultsTmpl = $.templates("#resultsTemplate");
-  var pageTmpl = $.templates("#pageTemplate");
+  var documentTmpl = $.templates("#documentTemplate");
+
+  // SERP number
   var page = 0;
 
+  // template for search request
   var dataString = {
       "from" : 0,
       "size" : 10,
@@ -118,17 +117,25 @@
       }
   };
 
+  // show SERP
   function backToSearchPage() {
     $('#search_page').hide();
     $('#serp').show();
   }
 
+  // mark a document as relevant
+  // 1) store docno in hidden input
+  // 2) rerender document by ID to show different button
   function markAsRelevant(docno, id) {
     var docnos = $('#relevant_marks').val().split(',');
     docnos.push(docno);
     $('#relevant_marks').val(docnos.join(','));
-    showSearchPage(id);
+    showDocument(id);
   }
+
+  // unmark a document as relevant
+  // 1) remove docno from hidden input
+  // 2) rerender document by ID to show different button
   function unmarkAsRelevant(docno, id) {
     var docnos = $('#relevant_marks').val().split(',');
     var index = docnos.indexOf(docno);
@@ -136,10 +143,11 @@
       docnos.splice(index, 1);
     }
     $('#relevant_marks').val(docnos.join(','));
-    showSearchPage(id);
+    showDocument(id);
   }
 
-  function showSearchPage(id) {
+  // show a document by Elastic ID
+  function showDocument(id) {
     relevant_marks = $('#relevant_marks').val().split(',');
     $.ajax({
         method: 'GET',
@@ -147,10 +155,12 @@
         dataType: 'json',
         contentType: 'application/json',
         success: function(data) {
+            // is the doc marked as relevant or not?
             data.marked_relevant = relevant_marks.indexOf(data._source.docno) !== -1
+            // show document
             console.log(data);
             $('#serp').hide();
-            $('#search_page').html(pageTmpl.render(data));
+            $('#search_page').html(documentTmpl.render(data));
             $('#search_page').show();
         },
         error: function(e) {
@@ -160,6 +170,7 @@
     });
   }
 
+  // show previous SERP
   function prevPage() {
     if(page >= 1) {
       page = page - 1;
@@ -168,6 +179,8 @@
     window.scrollTo(0,0);
     $('#current_page').html(page+1);
   }
+
+  // show next SERP
   function nextPage() {
     page = page + 1;
     doSearch(page);
@@ -179,7 +192,9 @@
     var searchid = $('#search_field').val();
 
     if(searchid!='') {
+      // implicit ANDing of search terms
       searchid = searchid.replace(' ', ' AND ');
+      // fill payload
       dataString.query.query_string.query = searchid;
       dataString.from = page;
       $.ajax({
@@ -190,11 +205,13 @@
           processData: false,
           data: JSON.stringify(dataString),
           success: function(data) {
+              // remove html tags from body field
               data = $.map(data.hits.hits, function(n, i){
                 d = $(n._source.body[0]);
                 n._source.body = d.text().substring(0, 255);
                 return n;
               });
+              // show results
               console.log(data);
               $('#search_page').hide();
               $('#results').html(resultsTmpl.render(data));
@@ -208,15 +225,8 @@
     }
   }
 
-  $('#form').on('keyup keypress', function(e) {
-      var keyCode = e.keyCode || e.which;
-      if (keyCode === 13) {
-        e.preventDefault();
-        return false;
-      }
-  });
-
   $(function(){
+    // when enter is pressed on the search field
     $('#search_field').keydown(function(event){
       page = 0;
       if(event.keyCode == 13) {
@@ -225,6 +235,7 @@
         return false;
       }
     });
+    // when the search button is clicked
     $('#search_button').click(function(event){
       page = 0;
       doSearch(page);
@@ -232,8 +243,16 @@
       return false;
     });
   });
+
+  // prevent the user from refreshing page
   window.addEventListener("beforeunload", function (e) {
       var confirmationMessage = 'When you close this page all your session data will be gone :( Select OK if you really want to leave, or Cancel otherwise.)';
+
+      // dont block when oTree submits page
+      timeLeft = parseInt($('.otree-timer__time-left').text().replace(':',''));
+      if(timeLeft <= 5) {
+        confirmationMessage = null;
+      }
 
       (e || window.event).returnValue = confirmationMessage; //Gecko + IE
       return confirmationMessage; //Gecko + Webkit, Safari, Chrome etc.
