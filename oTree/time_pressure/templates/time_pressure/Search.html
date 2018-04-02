@@ -47,6 +47,14 @@
         #serp {
           display: none;
         }
+
+        p {
+            margin-bottom: 0;
+        }
+
+        #results>div {
+            margin-bottom: 16px;
+        }
     </style>
 
 {% endblock %}
@@ -199,6 +207,14 @@
       });
     }
   }
+
+  $('#form').on('keyup keypress', function(e) {
+      var keyCode = e.keyCode || e.which;
+      if (keyCode === 13) {
+        e.preventDefault();
+        return false;
+      }
+  });
 
   $(function(){
     $('#search_field').keydown(function(event){
