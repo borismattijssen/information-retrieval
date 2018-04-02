@@ -1,0 +1,31 @@
+<script
+  src="https://code.jquery.com/jquery-3.3.1.min.js"
+  integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+  crossorigin="anonymous"></script>
+<script>
+var dataString = {
+        "from" : 0,
+        "size" : 10,
+        "query": {
+            "query_string" : {
+                "fields" : ["headline", "body"],
+                    "query" : "economy"
+            }
+        }
+    };
+
+$.ajax({
+    type: "GET",
+    url: "http://23.251.143.109:9200/_search",
+    dataType: 'json',
+    // contentType: 'application/json',
+    processData: false,
+    data: dataString,
+    success: function(data) {
+        console.log(data)
+    },
+    error: function(e) {
+      console.log(e);
+    }
+});
+</script>
