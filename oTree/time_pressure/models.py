@@ -25,10 +25,10 @@ class Constants(BaseConstants):
         [7, ''],
     ]
     topics = [
-        'topic 1',
-        'topic 2',
-        'topic 3',
-        'topic 4'
+        'wildlife extinction',
+        'journalist risk',
+        'piracy',
+        'population growth'
     ]
 
 
@@ -60,7 +60,7 @@ class Player(BasePlayer):
         widget=widgets.RadioSelectHorizontal
     )
 
-    total_task_time = models.FloatField()
+    total_task_time = models.FloatField(initial=300)
 
     topic = models.StringField()
     treatment = models.BooleanField()

@@ -1,6 +1,5 @@
 from otree.api import Currency as c, currency_range
 from ._builtin import Page, WaitPage
-from .models import Constants
 
 
 class Introduction(Page):
@@ -15,7 +14,7 @@ class Search(Page):
             return 900
 
     form_model = 'player'
-    form_fields = ['topic', 'total_task_time']
+    form_fields = ['total_task_time']
 
 
 class Questionnaire(Page):
