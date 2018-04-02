@@ -7,8 +7,78 @@
 
 {% block content %}
 
-    {% formfield player.submitted_answer label=player.question %}
+    <b>Did you feel time pressure?</b>
+
+    <table class="table">
+        <tr>
+            <th>strongly disagree</th>
+            <th>disagree</th>
+            <th>slightly disagree</th>
+            <th>neutral</th>
+            <th>slightly agree</th>
+            <th>agree</th>
+            <th>strongly agree</th>
+        </tr>
+        <tr>
+            {% for choice in form.feel_time_pressure %}
+                <td>{{ choice }}</td>
+            {% endfor %}
+        </tr>
+    </table>
+
+    <b>Did you feel the need to work fast?</b>
+
+    <table class="table">
+        <tr>
+            <th>strongly disagree</th>
+            <th>disagree</th>
+            <th>slightly disagree</th>
+            <th>neutral</th>
+            <th>slightly agree</th>
+            <th>agree</th>
+            <th>strongly agree</th>
+        </tr>
+        <tr>
+            {% for choice in form.need_work_fast %}
+                <td>{{ choice }}</td>
+            {% endfor %}
+        </tr>
+    </table>
+
+    <b>Did you feel hurried or rushed?</b>
+
+    <table class="table">
+        <tr>
+            <th>strongly disagree</th>
+            <th>disagree</th>
+            <th>slightly disagree</th>
+            <th>neutral</th>
+            <th>slightly agree</th>
+            <th>agree</th>
+            <th>strongly agree</th>
+        </tr>
+        <tr>
+            {% for choice in form.feel_hurried_rushed %}
+                <td>{{ choice }}</td>
+            {% endfor %}
+        </tr>
+    </table>
 
     {% next_button %}
+
+{% endblock %}
+
+{% block styles %}
+
+    <!--CSS-->
+    <style type="text/css">
+        table {
+            table-layout: fixed
+        }
+
+        th {
+            font-weight: normal
+        }
+    </style>
 
 {% endblock %}

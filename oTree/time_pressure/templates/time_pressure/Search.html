@@ -7,7 +7,7 @@
 
 {% block content %}
 
-    <p>Your task is to find relevant documents for the topic: (...)</p>
+    <p>Your task is to find relevant documents for the topic: {{ player.topic }}</p>
 
     <!--Search form-->
     <form>
@@ -16,7 +16,7 @@
 
     <!--Results-->
     <div class="results">
-
+        Results...
     </div>
 
     <!--Logs-->
@@ -27,9 +27,9 @@
 
 {% endblock %}
 
-<!--CSS-->
 {% block styles %}
 
+    <!--CSS-->
     <style type="text/css">
         input[type=text] {
             width: 100%;
@@ -38,9 +38,9 @@
 
 {% endblock %}
 
-<!--Javascript-->
 {% block scripts %}
 
+    <!--Javascript-->
     <script>
         $(document).ready(function () {
            var t0 = new Date().getTime() / 1000;
