@@ -10,20 +10,26 @@
     <p>Your task is to find relevant documents for the topic: {{ player.topic }}</p>
 
     <!--Search form-->
-    <form>
-        <input class="search" type="text" name="search" placeholder="Search..">
-    </form>
+    <input class="search" id="search_field" type="text" name="search" value="wildlife extinction" placeholder="Search..">
+    <input type="submit" id="search_button" value="Search">
+
+    <hr>
 
     <!--Results-->
-    <div id="results">
-        Results...
+    <div id="serp">
+      <div id="results"></div>
+      <div>
+        <a href="javascript:void(0)" onclick="prevPage()" class="btn btn-primary">&lt; previous page</a>
+        <a href="javascript:void(0)" onclick="nextPage()" class="btn btn-primary">next page &gt;</a>
+      </div>
+      Current page: <span id="current_page">1</span>
     </div>
+    <div id="search_page"></div>
 
     <!--Logs-->
     <input type="hidden" name="total_task_time"
     value="300" id="total_task_time"/>
-
-    {% next_button %}
+    <input type="hidden" name="relevant_marks" id="relevant_marks" value="">
 
 {% endblock %}
 
@@ -31,8 +37,15 @@
 
     <!--CSS-->
     <style type="text/css">
-        input[type=text] {
-            width: 100%;
+
+        .search_result {
+          margin-bottom: 20px;
+        }
+        .search_result_title {
+          font-weight: bold;
+        }
+        #serp {
+          display: none;
         }
     </style>
 
@@ -43,49 +56,171 @@
 
 
   <script id="resultsTemplate" type="text/x-jsrender">
+  <div class="search_result">
+    <a href="javascript:void(0)" class="search_result_title" onclick="showSearchPage('{% templatetag openvariable %}:_id{% templatetag closevariable %}')">{% templatetag openvariable %}:_source.headline{% templatetag closevariable %}</a><br>
+    {% templatetag openvariable %}:_source.body{% templatetag closevariable %}
+  </div>
+  </script>
+
+  <script id="pageButtonsTemplate" type="text/x-jsrender">
+
+  </script>
+
+  <script id="pageTemplate" type="text/x-jsrender">
+  <h1>{% templatetag openvariable %}:_source.headline{% templatetag closevariable %}</h1>
   <div>
-    <b>{% templatetag openvariable %}:_source.headline{% templatetag closevariable %}</b>
+    <a href="javascript:void(0)" onclick="backToSearchPage()" class="btn btn-primary">Back to search results</a>
+    {% templatetag openvariable %}if marked_relevant{% templatetag closevariable %}
+      <a href="javascript:void(0)" onclick="unmarkAsRelevant('{% templatetag openvariable %}:_source.docno{% templatetag closevariable %}','{% templatetag openvariable %}:_id{% templatetag closevariable %}')" class="btn btn-primary">Unmark as relevant</a>
+      You marked this document as relevant.
+    {% templatetag openvariable %}else{% templatetag closevariable %}
+      <a href="javascript:void(0)" onclick="markAsRelevant('{% templatetag openvariable %}:_source.docno{% templatetag closevariable %}','{% templatetag openvariable %}:_id{% templatetag closevariable %}')" class="btn btn-primary">Mark as relevant</a>
+    {% templatetag openvariable %}/if{% templatetag closevariable %}
+  </div>
+
+  <div class="search_page_content" style="margin: 20px 0 20px 0">
+    {% templatetag openvariable %}:_source.body[0]{% templatetag closevariable %}
+  </div>
+
+  <div>
+    <a href="javascript:void(0)" onclick="backToSearchPage()" class="btn btn-secondary">Back to search results</a>
+    {% templatetag openvariable %}if marked_relevant{% templatetag closevariable %}
+      <a href="javascript:void(0)" onclick="unmarkAsRelevant('{% templatetag openvariable %}:_source.docno{% templatetag closevariable %}','{% templatetag openvariable %}:_id{% templatetag closevariable %}')" class="btn btn-secondary">Unmark as relevant</a>
+      You marked this document as relevant.
+    {% templatetag openvariable %}else{% templatetag closevariable %}
+      <a href="javascript:void(0)" onclick="markAsRelevant('{% templatetag openvariable %}:_source.docno{% templatetag closevariable %}','{% templatetag openvariable %}:_id{% templatetag closevariable %}')" class="btn btn-secondary">Mark as relevant</a>
+    {% templatetag openvariable %}/if{% templatetag closevariable %}
   </div>
   </script>
 
   <!--Javascript-->
   <script>
   var resultsTmpl = $.templates("#resultsTemplate");
+  var pageTmpl = $.templates("#pageTemplate");
+  var page = 0;
+
+  var dataString = {
+      "from" : 0,
+      "size" : 10,
+      "query": {
+          "query_string" : {
+              "fields" : ["headline", "body"],
+              "query" : ""
+          }
+      }
+  };
+
+  function backToSearchPage() {
+    $('#search_page').hide();
+    $('#serp').show();
+  }
+
+  function markAsRelevant(docno, id) {
+    var docnos = $('#relevant_marks').val().split(',');
+    docnos.push(docno);
+    $('#relevant_marks').val(docnos.join(','));
+    showSearchPage(id);
+  }
+  function unmarkAsRelevant(docno, id) {
+    var docnos = $('#relevant_marks').val().split(',');
+    var index = docnos.indexOf(docno);
+    if (index > -1) {
+      docnos.splice(index, 1);
+    }
+    $('#relevant_marks').val(docnos.join(','));
+    showSearchPage(id);
+  }
+
+  function showSearchPage(id) {
+    relevant_marks = $('#relevant_marks').val().split(',');
+    $.ajax({
+        method: 'GET',
+        url: "http://35.190.214.52:9200/roy/_doc/" + id,
+        dataType: 'json',
+        contentType: 'application/json',
+        success: function(data) {
+            data.marked_relevant = relevant_marks.indexOf(data._source.docno) !== -1
+            console.log(data);
+            $('#serp').hide();
+            $('#search_page').html(pageTmpl.render(data));
+            $('#search_page').show();
+        },
+        error: function(e) {
+          alert('Something went wrong when the page. Please try again.');
+          console.log(e);
+        }
+    });
+  }
+
+  function prevPage() {
+    if(page >= 1) {
+      page = page - 1;
+    }
+    doSearch(page);
+    window.scrollTo(0,0);
+    $('#current_page').html(page+1);
+  }
+  function nextPage() {
+    page = page + 1;
+    doSearch(page);
+    window.scrollTo(0,0);
+    $('#current_page').html(page+1);
+  }
+
+  function doSearch(page) {
+    var searchid = $('#search_field').val();
+
+    if(searchid!='') {
+      searchid = searchid.replace(' ', ' AND ');
+      dataString.query.query_string.query = searchid;
+      dataString.from = page;
+      $.ajax({
+          method: 'POST',
+          url: "http://35.190.214.52:9200/_search",
+          dataType: 'json',
+          contentType: 'application/json',
+          processData: false,
+          data: JSON.stringify(dataString),
+          success: function(data) {
+              data = $.map(data.hits.hits, function(n, i){
+                d = $(n._source.body[0]);
+                n._source.body = d.text().substring(0, 255);
+                return n;
+              });
+              console.log(data);
+              $('#search_page').hide();
+              $('#results').html(resultsTmpl.render(data));
+              $('#serp').show();
+          },
+          error: function(e) {
+            alert('Something went wrong when retrieving your search results. Please try again.');
+            console.log(e);
+          }
+      });
+    }
+  }
 
   $(function(){
-    $(".search").keyup(function() {
-      var searchid = $(this).val();
-      var dataString = {
-          "from" : 0,
-          "size" : 10,
-          "query": {
-              "query_string" : {
-                  "fields" : ["headline", "body"],
-                  "query" : "economy"
-              }
-          }
-      };
-
-      if(searchid!='') {
-        dataString.query.query_string.query = searchid;
-        $.ajax({
-            method: 'POST',
-            url: "http://35.190.214.52:9200/_search",
-            dataType: 'json',
-            contentType: 'application/json',
-            processData: false,
-            data: JSON.stringify(dataString),
-            success: function(data) {
-                console.log(data)
-                $('#results').html(resultsTmpl.render(data.hits.hits));
-            },
-            error: function(e) {
-              console.log(e);
-            }
-        });
+    $('#search_field').keydown(function(event){
+      page = 0;
+      if(event.keyCode == 13) {
+        doSearch(page);
+        event.preventDefault();
+        return false;
       }
+    });
+    $('#search_button').click(function(event){
+      page = 0;
+      doSearch(page);
+      event.preventDefault();
       return false;
     });
+  });
+  window.addEventListener("beforeunload", function (e) {
+      var confirmationMessage = 'When you close this page all your session data will be gone :( Select OK if you really want to leave, or Cancel otherwise.)';
+
+      (e || window.event).returnValue = confirmationMessage; //Gecko + IE
+      return confirmationMessage; //Gecko + Webkit, Safari, Chrome etc.
   });
   </script>
 
