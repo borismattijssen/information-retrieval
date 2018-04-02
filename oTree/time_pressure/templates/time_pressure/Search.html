@@ -33,6 +33,14 @@
         input[type=text] {
             width: 100%;
         }
+
+        p {
+            margin-bottom: 0;
+        }
+
+        #results>div {
+            margin-bottom: 16px;
+        }
     </style>
 
 {% endblock %}
@@ -43,8 +51,8 @@
 
   <script id="resultsTemplate" type="text/x-jsrender">
   <div>
-    <b>{% templatetag openvariable %}:_source.headline{% templatetag closevariable %}</b>
-    <p>{% templatetag openvariable %}:_source.datetime{% templatetag closevariable %}
+    <p><b>{% templatetag openvariable %}:_source.headline{% templatetag closevariable %}</b> {% templatetag openvariable %}:_source.datetime{% templatetag closevariable %}</p>
+    <p>read more...</p>
   </div>
   </script>
 
