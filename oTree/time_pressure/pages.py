@@ -8,9 +8,10 @@ class Introduction(Page):
 
 class Search(Page):
     def vars_for_template(self):
-        return {'timeout_value': self.get_timeout_seconds()}
+        return {
+            'timeout_value': self.get_timeout_seconds()
+        }
     def get_timeout_seconds(self):
-        return 10
         if self.player.treatment == True:
             return 300
         else:

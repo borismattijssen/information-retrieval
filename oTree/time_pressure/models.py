@@ -26,28 +26,21 @@ class Constants(BaseConstants):
     ]
     topics = [
         ['Wildlife Extinction',
-         'The spotted owl episode in America highlighted U.S. efforts to prevent the extinction of wildlife species. '
-         'What is not well known is the effort of other countries to prevent the demise of species native to their countries. '
-         'What other countries have begun efforts to prevent such declines?',
+         'The spotted owl episode in America highlighted U.S. efforts to prevent the extinction of wildlife species. What is not well known is the effort of other countries to prevent the demise of species native to their countries. What other countries have begun efforts to prevent such declines?',
          'A relevant item will specify the country, the involved species, and steps taken to save the species.'
          ],
         ['Journalist Risk',
          'Identify instances where a journalist has been put at risk (e.g., killed, arrested or taken hostage) '
          'in the performance of his work.',
-         'Any document identifying an instance where a journalist or correspondent has been killed, '
-         'arrested or taken hostage in the performance of his work is relevant.'
+         'Any document identifying an instance where a journalist or correspondent has been killed, arrested or taken hostage in the performance of his work is relevant.'
          ],
         ['Piracy',
          'What modern instances have there been of old fashioned piracy, the boarding or taking control of boats?',
-         'Documents discussing piracy on any body of water are relevant.  Documents discussing the legal taking of '
-         'ships or their contents by a national authority are non-relevant.  Clashes between fishing vessels over'
-         'fishing are not relevant, unless one vessel is boarded.'
+         'Documents discussing piracy on any body of water are relevant.  Documents discussing the legal taking of ships or their contents by a national authority are non-relevant.  Clashes between fishing vessels over fishing are not relevant, unless one vessel is boarded.'
          ],
         ['Population Growth',
          'What measures have been taken worldwide and what countries have been effective in curbing population growth?',
-         'A relevant document must describe an actual case in which population measures have been taken and their results are known. '
-         'The reduction measures must have been actively pursued; that is, passive events such as disease or famine'
-         'involuntarily reducing the population are not relevant.'
+         'A relevant document must describe an actual case in which population measures have been taken and their results are known. The reduction measures must have been actively pursued; that is, passive events such as disease or famine involuntarily reducing the population are not relevant.'
          ]
     ]
 

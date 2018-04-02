@@ -30,6 +30,26 @@
     </div>
     <div id="search_page"></div>
 
+    <!--Modal-->
+    <div class="modal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">You're short on time</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p>It turns our that your meeting at work has been rescheduled.<br><br> This means you now only have 5 minutes to complete this exercise instead of 15.</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Let's start</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
 
     <!--Logs-->
     <input type="hidden" name="total_task_time" value="{{ timeout_value }}" id="total_task_time">
@@ -113,6 +133,12 @@
     {% templatetag openvariable %}/if{% templatetag closevariable %}
   </div>
   </script>
+
+  {%if timeout_value == 300 %}
+  <script>
+  $('.modal').modal('show');
+  </script>
+  {% endif %}
 
   <!--Javascript-->
   <script>
