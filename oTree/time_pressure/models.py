@@ -12,7 +12,7 @@ Information Retrieval
 
 
 class Constants(BaseConstants):
-    name_in_url = 'time_pressure'
+    name_in_url = 'geraldine'
     players_per_group = None
     num_rounds = 1
     choices = [
