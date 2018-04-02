@@ -16,7 +16,6 @@
 
     <!--Results-->
     <div id="results">
-        Results...
     </div>
 
     <!--Logs-->
@@ -45,12 +44,21 @@
   <script id="resultsTemplate" type="text/x-jsrender">
   <div>
     <b>{% templatetag openvariable %}:_source.headline{% templatetag closevariable %}</b>
+    <p>{% templatetag openvariable %}:_source.datetime{% templatetag closevariable %}
   </div>
   </script>
 
   <!--Javascript-->
   <script>
   var resultsTmpl = $.templates("#resultsTemplate");
+
+  $('#form').on('keyup keypress', function(e) {
+      var keyCode = e.keyCode || e.which;
+      if (keyCode === 13) {
+        e.preventDefault();
+        return false;
+      }
+  });
 
   $(function(){
     $(".search").keyup(function() {
@@ -61,13 +69,12 @@
           "query": {
               "query_string" : {
                   "fields" : ["headline", "body"],
-                  "query" : "economy"
+                  "query" : searchid
               }
           }
       };
 
       if(searchid!='') {
-        dataString.query.query_string.query = searchid;
         $.ajax({
             method: 'POST',
             url: "http://35.190.214.52:9200/_search",
