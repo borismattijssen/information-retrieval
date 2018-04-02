@@ -60,7 +60,16 @@ class Player(BasePlayer):
         widget=widgets.RadioSelectHorizontal
     )
 
-    total_task_time = models.FloatField(initial=300)
+    total_task_time = models.IntegerField()
+    relevant_marks = models.StringField()
+    marked_as_relevant = models.IntegerField()
+    queries_issued = models.IntegerField()
+    documents_viewed = models.IntegerField()
+    serps_viewed = models.IntegerField()
+    document_view_time = models.IntegerField()
+    serp_view_time = models.IntegerField()
+    hover_depth = models.FloatField()
+    current_hover_depth = models.FloatField()
 
     topic = models.StringField()
     treatment = models.BooleanField()

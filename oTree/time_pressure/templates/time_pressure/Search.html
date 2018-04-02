@@ -26,14 +26,24 @@
     </div>
     <div id="search_page"></div>
 
+
     <!--Logs-->
-    <input type="hidden" name="total_task_time"
-    value="300" id="total_task_time"/>
+    <input type="hidden" name="total_task_time" value="{{ timeout_value }}" id="total_task_time">
+    <!--Value based-->
     <input type="hidden" name="relevant_marks" id="relevant_marks" value="">
+    <!--Count based-->
     <input type="hidden" name="marked_as_relevant" id="marked_as_relevant" value="0">
     <input type="hidden" name="queries_issued" id="queries_issued" value="0">
     <input type="hidden" name="documents_viewed" id="documents_viewed" value="0">
     <input type="hidden" name="serps_viewed" id="serps_viewed" value="0">
+    <!--Time based-->
+    <input type="hidden" name="document_view_time" id="document_view_time" value="0">
+    <input type="hidden" name="serp_view_time" id="serp_view_time" value="0">
+    <!--View based-->
+    <input type="hidden" name="hover_depth" id="hover_depth" value="0">
+    <input type="hidden" name="current_hover_depth" id="current_hover_depth" value="0">
+
+
 
 {% endblock %}
 
@@ -108,11 +118,19 @@
 
   // SERP number
   var page = 0;
+  // timer used to measure how long document pages were viewed
+  var documentOpenedTimer;
+  // timer used to measure how long SERPs were viewed
+  var SERPOpenedTimer;
+  // the maximum SERP number for the current query
+  var currentMaxSERP = 0;
+  // number of results per SERP
+  const resultsPerSERP = 10;
 
   // template for search request
   var dataString = {
       "from" : 0,
-      "size" : 10,
+      "size" : resultsPerSERP,
       "query": {
           "query_string" : {
               "fields" : ["headline", "body"],
@@ -121,23 +139,66 @@
       }
   };
 
-  // increase the value of a hidden input
-  function increase(field){
+  // increment the value of a hidden input
+  function increment(field){
     var curr = parseInt($('#' + field).val());
     $('#' + field).val(curr + 1);
+  }
+  // increase the value of a hidden input
+  function increase(field, value) {
+    var curr = parseFloat($('#' + field).val());
+    $('#' + field).val(curr + value);
+  }
+
+  // start timer for document_view_time
+  function startDocumentOpenedTimer() {
+    if(documentOpenedTimer != null) {
+      clearInterval(documentOpenedTimer);
+    }
+    var time = getTime();
+    documentOpenedTimer = setInterval(function(){
+      var currTime = getTime();
+      var diff = currTime - time;
+      increase('document_view_time', diff);
+      time = currTime
+    }, 100);
+  }
+  // stop the timer for document_view_time
+  function stopDocumentOpenedTimer() {
+    clearInterval(documentOpenedTimer);
+    documentOpenedTimer = null;
+  }
+
+  // start timer for document_view_time
+  function startSERPOpenedTimer() {
+    if(SERPOpenedTimer != null) {
+      clearInterval(SERPOpenedTimer);
+    }
+    // use this to prevent drift (https://www.quora.com/How-accurate-are-JavaScript-timers)
+    var time = getTime();
+    SERPOpenedTimer = setInterval(function(){
+      var currTime = getTime();
+      var diff = currTime - time;
+      increase('serp_view_time', diff);
+      time = currTime
+    }, 100);
+  }
+  // stop the timer for document_view_time
+  function stopSERPOpenedTimer() {
+    clearInterval(SERPOpenedTimer);
+    SERPOpenedTimer = null;
   }
 
   // show SERP
   function backToSearchPage() {
-    $('#search_page').hide();
-    $('#serp').show();
+    goToPage(page);
   }
 
   // mark a document as relevant
   // 1) store docno in hidden input
   // 2) rerender document by ID to show different button
   function markAsRelevant(docno, id) {
-    increase('marked_as_relevant');
+    increment('marked_as_relevant');
     var docnos = $('#relevant_marks').val().split(',');
     docnos.push(docno);
     $('#relevant_marks').val(docnos.join(','));
@@ -157,10 +218,20 @@
     renderDocument(id);
   }
 
+  // get time in milliseconds
+  function getTime() {
+    var d = new Date();
+    return d.getTime();
+  }
+
   // increase the amount of documents viewed and render it
   function showDocument(id) {
-    increase('documents_viewed');
+    increment('documents_viewed');
+    startDocumentOpenedTimer();
+    stopSERPOpenedTimer();
+    // handleSERPTiming(false);
     renderDocument(id);
+    window.scrollTo(0,0);
   }
 
   // show a document by Elastic ID
@@ -189,29 +260,41 @@
 
   // show previous SERP
   function prevPage() {
-    if(page >= 1) {
-      page = page - 1;
-    }
-    doSearch(page);
-    window.scrollTo(0,0);
-    $('#current_page').html(page+1);
+    goToPage(page - 1);
   }
 
   // show next SERP
   function nextPage() {
-    page = page + 1;
-    doSearch(page);
+    goToPage(page + 1);
+  }
+
+  // show specific page
+  function goToPage(newPage) {
+    if(newPage >= 0) {
+      page = newPage;
+      doSearch(page);
+    }
     window.scrollTo(0,0);
     $('#current_page').html(page+1);
   }
 
+  // only increment serps_viewed when the user hasn't visited this SERP for this query yet
+  function handleSERPsViewed() {
+    if(page > currentMaxSERP) {
+      increment('serps_viewed');
+      currentMaxSERP = page;
+    }
+  }
+
+  // query elastic and render the results page
   function doSearch(page) {
     var searchid = $('#search_field').val();
-
     if(searchid!='') {
-      increase('serps_viewed');
+      stopDocumentOpenedTimer();
+      startSERPOpenedTimer();
+      handleSERPsViewed();
       // implicit ANDing of search terms
-      searchid = searchid.replace(' ', ' AND ');
+      searchid = searchid.trim().replace(' ', ' AND ');
       // fill payload
       dataString.query.query_string.query = searchid;
       dataString.from = page;
@@ -244,22 +327,50 @@
     }
   }
 
+  // process a query a user submitted
+  function processQuery() {
+    page = 0;
+    currentMaxSERP = 0;
+    doSearch(page);
+    increment('queries_issued');
+    increment('serps_viewed');
+    increase('hover_depth', parseFloat($('#current_hover_depth').val()));
+    $('#current_hover_depth').val(0);
+  }
+
+  $(window).scroll(function(event) {
+    if($('#results').is(":visible") && page == 0) {
+      var docViewTop = $(window).scrollTop();
+      var docViewBottom = docViewTop + $(window).height();
+
+      var resultsOffset = $('#results').offset().top;
+      var resultsVisible = docViewBottom - resultsOffset;
+
+      var resultsHeight = $('#results').height();
+
+      var percentageViewed = parseFloat(resultsVisible) / parseFloat(resultsHeight);
+      if(percentageViewed > 1) {
+        percentageViewed = 1;
+      }
+
+      if(percentageViewed > parseFloat($('#current_hover_depth').val())) {
+        $('#current_hover_depth').val(percentageViewed);
+      }
+    }
+  });
+
   $(function(){
     // when enter is pressed on the search field
     $('#search_field').keydown(function(event){
       if(event.keyCode == 13) {
-        page = 0;
-        doSearch(page);
-        increase('queries_issued');
+        processQuery();
         event.preventDefault();
         return false;
       }
     });
     // when the search button is clicked
     $('#search_button').click(function(event){
-      page = 0;
-      doSearch(page);
-      increase('queries_issued');
+      processQuery();
       event.preventDefault();
       return false;
     });
@@ -270,14 +381,10 @@
       var confirmationMessage = 'When you close this page all your session data will be gone :( Select OK if you really want to leave, or Cancel otherwise.)';
 
       // dont block when oTree submits page
-      timeLeft = parseInt($('.otree-timer__time-left').text().replace(':',''));
-      console.log(timeLeft);
-      if(timeLeft <= 5) {
-        confirmationMessage = null;
+      if(document.getElementsByName('timeout_happened').length == 0) {
+        (e || window.event).returnValue = confirmationMessage; //Gecko + IE
+        return confirmationMessage; //Gecko + Webkit, Safari, Chrome etc.
       }
-
-      (e || window.event).returnValue = confirmationMessage; //Gecko + IE
-      return confirmationMessage; //Gecko + Webkit, Safari, Chrome etc.
   });
   </script>
 
