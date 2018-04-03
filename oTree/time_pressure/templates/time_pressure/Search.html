@@ -118,7 +118,7 @@
   {% templatetag openvariable %}include tmpl="#relevantButtonTemplate"/{% templatetag closevariable %}
 
   <div class="search_page_content" style="margin: 20px 0 20px 0">
-    {% templatetag openvariable %}:_source.body[0]{% templatetag closevariable %}
+    {% templatetag openvariable %}:_source.body{% templatetag closevariable %}
   </div>
 
   {% templatetag openvariable %}include tmpl="#relevantButtonTemplate"/{% templatetag closevariable %}
@@ -283,6 +283,7 @@
             // is the doc marked as relevant or not?
             data.marked_relevant = relevant_marks.indexOf(data._source.docno) !== -1
             // show document
+            data._source.body = typeof data._source.body == "string" ? data._source.body : data._source.body[0];
             console.log(data);
             $('#serp').hide();
             $('#search_page').html(documentTmpl.render(data));
@@ -345,9 +346,14 @@
           success: function(data) {
               // remove html tags from body field
               data = $.map(data.hits.hits, function(n, i){
-                // body = n._source.body.constructor === Array ? n._source.body[0] : n._source.body;
-                d = $(n._source.body[0]);
-                n._source.body = d.text().substring(0, 255);
+                // sometimes the body is in an array
+                if(typeof n._source.body != "string") {
+                  n._source.body = n._source.body[0];
+                }
+                // remove html tags
+                n._source.body = n._source.body.replace(/<\/?[^>]+(>|$)/g, "");
+                // substring for snippet
+                n._source.body = n._source.body.substring(0, 255);
                 return n;
               });
               // show results
