@@ -67,6 +67,9 @@
     <input type="hidden" name="hover_depth" id="hover_depth" value="0">
     <input type="hidden" name="current_hover_depth" id="current_hover_depth" value="0">
 
+    <hr>
+    <button class="otree-btn-next btn btn-primary">I'm finished with this task, take met to the next page</button>
+
 
 
 {% endblock %}
@@ -163,6 +166,9 @@
   var currentMaxSERP = 0;
   // number of results per SERP
   const resultsPerSERP = 10;
+
+  // indicates whether user submitted next button
+  var userIssuedNext = false;
 
   // template for search request
   var dataString = {
@@ -417,6 +423,26 @@
       event.preventDefault();
       return false;
     });
+
+    $(".otree-btn-next").click(function(){
+        var timeLeft = $('.otree-timer__time-left').text().split(':');
+        var conf = confirm("You're about to leave this search task while you still have " + timeLeft[0] + ":" + timeLeft[1] + " time left, are you sure?");
+        
+        if(conf === false) {
+          return false;
+        }
+
+        var minutesLeft = parseInt(timeLeft[0]);
+        var secondsLeft = parseInt(timeLeft[1]);
+
+        var totalSecondsLeft = minutesLeft*60 + secondsLeft;
+
+        var initialTaskTime = parseInt($("#total_task_time").val());
+
+        $("#total_task_time").val(initialTaskTime - totalSecondsLeft);
+
+        userIssuedNext = true;
+    });
   });
 
   // prevent the user from refreshing page
@@ -424,7 +450,9 @@
       var confirmationMessage = 'When you close this page all your session data will be gone :( Select OK if you really want to leave, or Cancel otherwise.)';
 
       // dont block when oTree submits page
-      if(document.getElementsByName('timeout_happened').length == 0) {
+      // console.log(userIssuedNext);
+      // console.log(document.getElementsByName('timeout_happened').length);
+      if(document.getElementsByName('timeout_happened').length == 0 && userIssuedNext === false) {
         (e || window.event).returnValue = confirmationMessage; //Gecko + IE
         return confirmationMessage; //Gecko + Webkit, Safari, Chrome etc.
       }
