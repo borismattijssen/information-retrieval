@@ -41,7 +41,7 @@
             </button>
           </div>
           <div class="modal-body">
-            <p>It turns our that your meeting at work has been rescheduled.<br><br> This means you now only have 5 minutes to complete this exercise instead of 15.</p>
+            <p>It turns out that your meeting at work has been rescheduled.<br><br> This means you now only have 5 minutes to complete this exercise instead of 15.</p>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Let's start</button>
@@ -335,7 +335,7 @@
       searchid = searchid.trim().replace(' ', ' AND ');
       // fill payload
       dataString.query.query_string.query = searchid;
-      dataString.from = page;
+      dataString.from = page * resultsPerSERP;
       $.ajax({
           method: 'POST',
           url: "http://" + elasticIP + ":9200/_search",
