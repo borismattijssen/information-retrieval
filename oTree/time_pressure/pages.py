@@ -7,9 +7,30 @@ class Introduction(Page):
 
 
 class Search(Page):
+    topic_descriptions = {
+        'Wildlife Extinction': {
+             'task': 'Your task is to find out how countries try to prevent the decline of species native to their countries.',
+             'relevant': '<ul><li>A <span class="highlight">relevant</span> document should specify the <span class="highlight">country</span>, the <span class="highlight">involved species</span>, and <span class="highlight">steps taken</span> to save the species.</li><li>A <span class="highlight">not relevant</span> document discusses wildlife extinction prevention in <span class="highlight">America</span>.</li></ul>'
+         },
+         'Journalist Risk': {
+             'task': 'Identify instances where a journalist has been put at risk (e.g., killed, arrested or taken hostage) in the performance of his work.',
+             'relevant': '<ul><li>Any document identifying an instance where a journalist or correspondent has been <span class="highlight">killed</span>, <span class="highlight">arrested</span> or <span class="highlight">taken hostage</span> while performing his/her work is relevant.</li></ul>'
+         },
+         'Piracy': {
+            'task': 'Identify modern instances of old fashioned piracy, that is the boarding or taking control of boats in the recent past.',
+            'relevant': '<ul><li>Documents discussing piracy on any body of water are <span class="highlight">relevant</span>.</li><li>Documents discussing the legal taking of ships or their contents by a national authority are <span class="highlight">non-relevant</span>.</li><li>Clashes between fishing vessels over fishing are <span class="highlight">not relevant</span>.</li></ul>'
+         },
+         'Population Growth': {
+            'task': 'Identify what measures have been taken to control population growth worldwide and identify the countries that have been effective at doing so.',
+            'relevant': '<ul><li>Documents describing a case in which population measures have been taken of which the results are known are <span class="highlight">relevant</span>.</li><li>Passive events such as disease or famine involuntarily reducing the population are <span class="highlight">not relevant</span>.</li></ul>'
+        }
+    }
+
     def vars_for_template(self):
         return {
-            'timeout_value': self.get_timeout_seconds()
+            'timeout_value': self.get_timeout_seconds(),
+            'task_description': self.topic_descriptions[self.player.topicname]['task'],
+            'relevant_description': self.topic_descriptions[self.player.topicname]['relevant']
         }
     def get_timeout_seconds(self):
         if self.player.treatment == True:

@@ -2,29 +2,31 @@
 {% load staticfiles otree %}
 
 {% block title %}
-    Search Task
+    Search Task: {{ player.topicname }}
 {% endblock %}
 
 {% block content %}
 
-    <p>Your task is to find relevant documents for the topic: <b>{{ player.topicname }}</b></p><br>
+    <p>
+    {{ task_description|safe }}
+    {{ relevant_description|safe }}
+  </p>
+  <hr>
 
-    <p>{{ player.topicdes }}</p><br>
+    <div class="input-group mb-3" id="search_group">
+      <input class="form-control" id="search_field" type="text" name="search" value="" placeholder="Search.." aria-label="Search.." aria-describedby="basic-addon2">
+      <div class="input-group-append">
+        <button class="btn btn-outline-secondary" id="search_button" type="button">Search</button>
+      </div>
+    </div>
 
-    <p>{{ player.topicnar }}</p><br>
-
-    <!--Search form-->
-    <input class="search" id="search_field" type="text" name="search" value="" placeholder="Search..">
-    <input type="submit" id="search_button" value="Search">
-
-    <hr>
 
     <!--Results-->
     <div id="serp">
       <div id="results"></div>
       <div>
-        <a href="javascript:void(0)" onclick="prevPage()" class="btn btn-secondary">&lt; previous page</a>
-        <a href="javascript:void(0)" onclick="nextPage()" class="btn btn-secondary">next page &gt;</a>
+        <a href="javascript:void(0)" onclick="prevPage()" class="btn btn-outline-secondary">&lt; previous page</a>
+        <a href="javascript:void(0)" onclick="nextPage()" class="btn btn-outline-secondary">next page &gt;</a>
       </div>
       Current page: <span id="current_page">1</span>
     </div>
@@ -41,7 +43,7 @@
             </button>
           </div>
           <div class="modal-body">
-            <p>It turns out that your meeting at work has been rescheduled.<br><br> This means you now only have 5 minutes to complete this exercise instead of 15.</p>
+            <p>It turns out that your meeting at work has been rescheduled.<br><br> This means you now only have 5 minutes to complete this task instead of 15.</p>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Let's start</button>
@@ -68,7 +70,7 @@
     <input type="hidden" name="current_hover_depth" id="current_hover_depth" value="0">
 
     <hr>
-    <button class="otree-btn-next btn btn-primary">I'm finished with this task, take met to the next page</button>
+    <button class="otree-btn-next btn btn-outline-primary">I'm finished with this task, take met to the next page</button>
 
 
 
@@ -88,8 +90,12 @@
         #serp {
           display: none;
         }
-        #search_field{
-          width: 600px;
+        .input-group, input.form-control, select.form-control, textarea.form-control {
+          max-width: 100%;
+        }
+        .highlight{
+          color: #007bff;
+          font-style: italic;
         }
 
         p {
@@ -130,12 +136,12 @@
   <!--Mark or unmark as relevance (used in #documentTemplate)-->
   <script id="relevantButtonTemplate" type="text/x-jsrender">
   <div>
-    <a href="javascript:void(0)" onclick="backToSearchPage()" class="btn btn-secondary">Back to search results</a>
+    <a href="javascript:void(0)" onclick="backToSearchPage()" class="btn btn-outline-secondary">Back to search results</a>
     {% templatetag openvariable %}if marked_relevant{% templatetag closevariable %}
-      <a href="javascript:void(0)" onclick="unmarkAsRelevant('{% templatetag openvariable %}:_source.docno{% templatetag closevariable %}','{% templatetag openvariable %}:_id{% templatetag closevariable %}')" class="btn btn-secondary">Unmark as relevant</a>
+      <a href="javascript:void(0)" onclick="unmarkAsRelevant('{% templatetag openvariable %}:_source.docno{% templatetag closevariable %}','{% templatetag openvariable %}:_id{% templatetag closevariable %}')" class="btn btn-outline-secondary">Unmark as relevant</a>
       You marked this document as relevant.
     {% templatetag openvariable %}else{% templatetag closevariable %}
-      <a href="javascript:void(0)" onclick="markAsRelevant('{% templatetag openvariable %}:_source.docno{% templatetag closevariable %}','{% templatetag openvariable %}:_id{% templatetag closevariable %}')" class="btn btn-secondary">Mark as relevant</a>
+      <a href="javascript:void(0)" onclick="markAsRelevant('{% templatetag openvariable %}:_source.docno{% templatetag closevariable %}','{% templatetag openvariable %}:_id{% templatetag closevariable %}')" class="btn btn-outline-secondary">Mark as relevant</a>
     {% templatetag openvariable %}/if{% templatetag closevariable %}
   </div>
   </script>
@@ -427,7 +433,7 @@
     $(".otree-btn-next").click(function(){
         var timeLeft = $('.otree-timer__time-left').text().split(':');
         var conf = confirm("You're about to leave this search task while you still have " + timeLeft[0] + ":" + timeLeft[1] + " time left, are you sure?");
-        
+
         if(conf === false) {
           return false;
         }
